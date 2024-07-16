@@ -1,0 +1,40 @@
+.formControl {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.75rem;
+}
+
+.formControl label {
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.formControl input:focus, 
+.formControl textarea:focus {
+    border-color: #3D1365;
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem rgba(61,19,101,.25);
+}
+
+.formControl.formControl2 input:focus, 
+.formControl.formControl2 textarea:focus {
+    box-shadow: none;
+    background-color: rgba(61,19,101,.25);
+}
+
+.formControl input,
+.formControl textarea {
+    padding: 7px;
+    border: 1px solid #DEE2E6;
+    border-radius: 5px;
+    transition: .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+.formControl textarea {
+    resize: none;
+}
+
+.formControl.formControl2 input {
+    transition: .15s ease-in-out,background-color .15s ease-in-out;
+}
