@@ -8,8 +8,9 @@ const Technology = mongoose.model(
                 type: String,
                 required: true
             },
-            iconDir: {
-                type: String
+            icon: {
+                iconPrefix: String,
+                iconName: String
             }
         }
     )

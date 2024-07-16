@@ -12,7 +12,7 @@ const Annotation = mongoose.model(
                 type: String,
                 required: true
             },
-            technology: Object,
+            technologies: [{}],
         }, 
         { timestamps: true }
     )
