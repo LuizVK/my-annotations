@@ -16,7 +16,7 @@ export default class AnnotationController {
 
         try {
             const annotations = await Annotation
-                .find({ $or: [{ title: new RegExp(key) }, { description: new RegExp(key) }] })
+                .find({ $or: [{ title: new RegExp(key, 'i') }, { description: new RegExp(key, 'i') }, { "technologies.name": new RegExp(key, 'i') }] })
                 .sort(filterOrder === 'asc' ? 'createdAt' : '-createdAt')
 
             res.status(200)
@@ -54,7 +54,7 @@ export default class AnnotationController {
     }
 
     static async createAnnotation(req, res) {
-        const { title, description, id_technology } = req.body
+        const { title, description, technologies } = req.body
 
         if (!title) {
             return res
@@ -68,21 +68,33 @@ export default class AnnotationController {
                 .json({ message: 'A descrição é obrigatória!' })
         }
 
-        if (!id_technology) {
+        if (!technologies || !Array.isArray(technologies) || technologies.length <= 0) {
             return res
                 .status(422)
-                .json({ message: 'É obrigatório informar a tecnologia!' })
+                .json({ message: 'É obrigatório informar uma ou mais tecnologias!' })
         }
+        
+        let technologies_ids = []
+        let invalid_id = false
 
-        if (!mongoose.isValidObjectId(id_technology)) {
+        technologies.forEach((id_technology) => {
+            if (!mongoose.isValidObjectId(id_technology)) {
+                invalid_id = true
+                return
+            }
+
+            technologies_ids.push(id_technology)   
+        })
+        
+        if (invalid_id) {
             return res
-                .status(422)
+               .status(422)
                 .json({ message: 'ID da tecnologia inválido!' })
         }
 
-        const technology = await Technology.findOne({ _id: id_technology })
+        const technologies_arr = await Technology.find({ _id: { $in: technologies_ids } }).lean()
 
-        if (!technology) {
+        if (technologies_arr.length != technologies_ids.length) {
             return res
                 .status(404)
                 .json({ message: 'Tecnologia informada não encontrada!' })
@@ -91,10 +103,7 @@ export default class AnnotationController {
         const annotation = new Annotation({
             title,
             description,
-            technology: {
-                _id: technology._id,
-                name: technology.name
-            }
+            technologies: technologies_arr
         })
 
         try {
@@ -124,7 +133,7 @@ export default class AnnotationController {
                 .json({ message: 'Anotação não encontrada!' })
         }
 
-        const { title, description, id_technology } = req.body
+        const { title, description, technologies } = req.body
 
         if (!title) {
             return res
@@ -138,33 +147,62 @@ export default class AnnotationController {
                 .json({ message: 'A descrição é obrigatória!' })
         }
 
-        if (!id_technology) {
+        if (!technologies || !Array.isArray(technologies) || technologies.length <= 0) {
             return res
                 .status(422)
-                .json({ message: 'É obrigatório informar a tecnologia!' })
+                .json({ message: 'É obrigatório informar uma ou mais tecnologias!' })
         }
+        
+        let technologies_ids = []
+        let invalid_id = false
 
-        if (!mongoose.isValidObjectId(id_technology)) {
+        technologies.forEach((id_technology) => {
+            if (!mongoose.isValidObjectId(id_technology)) {
+                invalid_id = true
+                return
+            }
+
+            technologies_ids.push(id_technology)   
+        })
+        
+        if (invalid_id) {
             return res
-                .status(422)
+               .status(422)
                 .json({ message: 'ID da tecnologia inválido!' })
         }
 
-        const technology = await Technology.find({ _id: id_technology })
+        const technologies_arr = await Technology.find({ _id: { $in: technologies_ids } }).lean()
 
-        if (!technology) {
+        if (technologies_arr.length != technologies_ids.length) {
             return res
                 .status(404)
-                .message({ message: 'Tecnologia informada não encontrada!' })
+                .json({ message: 'Tecnologia informada não encontrada!' })
         }
+
+        // if (!id_technology) {
+        //     return res
+        //         .status(422)
+        //         .json({ message: 'É obrigatório informar a tecnologia!' })
+        // }
+
+        // if (!mongoose.isValidObjectId(id_technology)) {
+        //     return res
+        //         .status(422)
+        //         .json({ message: 'ID da tecnologia inválido!' })
+        // }
+
+        // const technology = await Technology.find({ _id: id_technology })
+
+        // if (!technology) {
+        //     return res
+        //         .status(404)
+        //         .message({ message: 'Tecnologia informada não encontrada!' })
+        // }
 
         const updatedAnnotationData = {
             title,
             description,
-            technology: {
-                _id: technology._id,
-                name: technology.name
-            }
+            technologies: technologies_arr
         }
 
         try {

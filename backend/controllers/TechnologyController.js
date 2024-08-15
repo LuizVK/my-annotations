@@ -41,7 +41,7 @@ export default class TechnologyController {
     }
 
     static async createTechnology(req, res) {
-        const { name, iconDir } = req.body
+        const { name, iconPrefix, iconName } = req.body
 
         if (!name) {
             return res
@@ -51,7 +51,10 @@ export default class TechnologyController {
 
         const technology = new Technology({
             name,
-            iconDir
+            icon: {
+                iconPrefix,
+                iconName
+            }
         })
 
         try {
@@ -82,7 +85,7 @@ export default class TechnologyController {
                 .json({ message: 'Tecnologia não encontrada!' })
         }
 
-        const { name, iconDir } = req.body
+        const { name, iconPrefix, iconName } = req.body
 
         if (!name) {
             return res
@@ -92,7 +95,10 @@ export default class TechnologyController {
 
         const updatedTechnologyData = {
             name,
-            iconDir
+            icon: {
+                iconPrefix,
+                iconName
+            }
         }
 
         try {
